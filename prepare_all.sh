@@ -35,6 +35,13 @@ cp -r $RSC_MANUAL_CORR_DIR/abs_printed/fla ./abs_printed
 cp -r $RSC_MANUAL_CORR_DIR/proceedings/fla ./proceedings
 cp -r $RSC_MANUAL_CORR_DIR/proceedings/nws ./proceedings
 cp -r $RSC_MANUAL_CORR_DIR_2/transactions ./
+cp -r $RSC_MANUAL_CORR_DIR_3/* ./
+cp -r $RSC_MANUAL_CORR_DIR_3_2/* ./
+cp -r $RSC_MANUAL_CORR_DIR_3_5/* ./
+
+# For the time being, remove all "mis" files
+
+rm -rf */mis
 
 # Remove "Meteorological Journal" tables
 
@@ -101,24 +108,56 @@ for year in 1854  1856  1857  1859  1860  1862  1863  1865  1866  1867  1868  18
 
 ./rampages.py rampages_list.txt
 
+# Add topics to the metadata
+echo "Adding topics to the metadata"
+./topicalise_2_0.py
+
 # Add the hasAbstract/isAbstractOf relation to the relevant xml filess
 
 echo "correlating articles and their abstracts"
 ./art_abs.py
 
+# Some files don't have any pages at this stage, remove them
+
 # un-hide hidden markup. We do this last to avoid mangling of the additional
 # markup by make_vrt.py
 echo "running some very simple patterns on all files"
 
-for ((year=1665; year<1870; year++)); do  if [ -d transactions/fla/$year ]; then sed -f postprocess.sed  -i transactions/fla/$year/*.xml ; fi; done
+for ((year=1665; year<1870; year++));
+  do
+    if [ -d transactions/fla/$year ]; 
+      then 
+        sed -f postprocess.sed  -i transactions/fla/$year/*.xml ; 
+#        sed -f decode.sed  -i transactions/fla/$year/*.xml ; 
+    fi; 
+  done
 
-for ((year=1665; year<1762; year++)); do  if [ -d transactions/brv/$year ]; then sed -f postprocess.sed  -i transactions/brv/$year/*.xml ; fi; done
+for ((year=1665; year<1762; year++));
+  do
+    if [ -d transactions/brv/$year ]; 
+      then 
+         sed -f postprocess.sed  -i transactions/brv/$year/*.xml ;
+#         sed -f decode.sed  -i transactions/brv/$year/*.xml ;
+    fi; 
+  done
 
-for year in 1843 1850; do sed -f postprocess.sed -i abs_communicated/fla/$year/*.xml; done
+for year in 1843 1850; 
+  do
+     sed -f postprocess.sed -i abs_communicated/fla/$year/*.xml;
+#     sed -f decode.sed -i abs_communicated/fla/$year/*.xml;
+   done
 
-for year in 1800 1815 1830 1837; do sed -f postprocess.sed -i abs_printed/fla/$year/*.xml; done
+for year in 1800 1815 1830 1837;
+ do
+    sed -f postprocess.sed -i abs_printed/fla/$year/*.xml;
+#    sed -f decode.sed -i abs_printed/fla/$year/*.xml;
+  done
 
-for year in 1854  1856  1857  1859  1860  1862  1863  1865  1866  1867  1868  1869; do sed -f postprocess.sed -i proceedings/*/$year/*.xml; done
+for year in 1854  1856  1857  1859  1860  1862  1863  1865  1866  1867  1868  1869;
+  do
+    sed -f postprocess.sed -i proceedings/*/$year/*.xml;
+#    sed -f decode.sed -i proceedings/*/$year/*.xml;
+  done
 
 # Remove footnote
 echo "removing footnotes"
@@ -144,10 +183,14 @@ for year in 1854  1856  1857  1859  1860  1862  1863  1865  1866  1867  1868  18
 # sed -i -e "/^\s*<page>.\{0,12\}<\/page>\s*$/d" transactions/*/*/*.xml
 
 # Remove pages shorter than 129 characters in one line. This removes 1294 
-# pages (by inspection, they all containt more or less junk from OCR'ed
+# pages (by inspection, they all contain more or less junk from OCR'ed
 # figures and tables)
 
-sed -i -e "/^\s*<page>.\{0,128\}<\/page>\s*$/d" transactions/*/*/*.xml
+sed -i -e "/^\s*<page>.\{0,128\}<\/page>\s*$/d" */*/*/*.xml
+
+echo "removing some pageless articles (consisting only of tables originally)"
+
+rm -f `grep -L  "<page"  */*/*/*.xml`
 
 # Run the period specific scripts
 echo "preparing years 1665--1775 (including the book reviews)"
@@ -195,17 +238,28 @@ sed -f hyphen_repair.sed -i proceedings/*/*/*.xml
 
 # We apply only a selection of the rules, fine tuned to our corpus ...
 echo "prenormalising the whole corpus (lots of patterns)"
-sed -f selection8.sed -i transactions/*/*/*.xml
-sed -f selection8.sed -i abs_*/*/*/*.xml
-sed -f selection8.sed -i proceedings/*/*/*.xml
+sed -f sel-general.sed -i */*/*/*.xml
+sed -f sel-prefix.sed -i */*/*/*.xml
+sed -f sel-suffix.sed -i */*/*/*.xml
+sed -f sel-words.sed -i */*/*/*.xml
+
+# We apply only a selection of the rules, fine tuned to our corpus ...
 echo "running the patterns a second time"
-sed -f selection8.sed -i transactions/*/*/*.xml
-sed -f selection8.sed -i abs_*/*/*/*.xml
-sed -f selection8.sed -i proceedings/*/*/*.xml
+sed -f sel-prefix.sed -i */*/*/*.xml
+sed -f sel-suffix.sed -i */*/*/*.xml
+sed -f sel-words.sed -i */*/*/*.xml
+
+# Announce tests
+echo "* * * build complete, doing some quality checks * * *"
+
+# Quality assurance: Test for pageless articles
+
+echo "testing for pageless articles"
+grep -L "<page" */*/*/*
 
 # Quality Assurance: Test that all xml files are well-formed
 
-echo "Testing the well-formedness of the XML files"
+echo "testing the well-formedness of the XML files"
 for i in transactions/*/*/*.xml; do xmllint --noout $i; done
 for i in abs*/*/*/*.xml; do xmllint --noout $i; done
 for i in proceedings/*/*/*.xml; do xmllint --noout $i; done

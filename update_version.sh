@@ -6,5 +6,5 @@
 
 echo "Updating some version stamps, version=$CORPUS_BUILD"
 
-for i in selection8.sed; do sed -e "s/\# version:.*/\# version: $CORPUS_BUILD/g" -i $i; done
+for i in hyphen_repair.sed sel-*.sed;  do sed -e "s/\# version:.*/\# version: $CORPUS_BUILD/g" -i $i; done
 

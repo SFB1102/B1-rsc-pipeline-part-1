@@ -1,11 +1,13 @@
 # This repairs some missed hyphenations in the RSC corpus
+# version: 4.0
+
 
 # First group: 
 # The hyphen was followed by some dark spot (usually ".") on the paper
 
 s/\bad-\. /ad/g
 s/\bap-\. /ap/g
-s/\bbascer-\. /ascer/g
+s/\bascer-\. /ascer/g
 s/\bcir-\. /cir/g
 s/\bcon-\. /con/g
 s/\bde-\. /de/g
@@ -43,7 +45,7 @@ s/\btrans-\. /trans/g
 # One pattern is sufficient :-)
 s/\(\w\)`` /\1/g
 
-# Thirs group: the hyphen became a question mark
+# Third group: the hyphen became a question mark
 s/\bac? compan/accompan/g
 s/\bac? cord/accord/g
 s/\baccord? ing/according/g
@@ -217,6 +219,59 @@ s/\bTrans? actions/Transactions/g
 s/\btrans? mit/transmit/g
 s/\bva? rious/various/g
 s/\bwith? out/without/g
+
+# Forth group: The hyphen is removed, but a dot remains
+s/\bad\. dres/adres/g
+s/\bad\. duct/adduct/g
+s/\bad\. just/adjust/g
+s/\bafter\. wards/afterwards/g
+s/\bap\. p/app/g
+s/\bbe\. tween/between/g
+s/\bcombina\. tion/combination/g
+s/\bcom\. mu/commu/g
+s/\bcom\. p/comp/g
+s/\bcon\. cl/concl/g
+s/\bcon\. di/condi/g
+s/\bcon\. duct/conduct/g
+s/\bcon\. jec/conjec/g
+s/\bcon\. nect/connect/g
+s/\bcon\. tra/contra/g
+s/\bcon\. s/cons/g
+s/\bde\. cre/decre/g
+s/\bdia\. met/diamet/g
+s/\bdis\. cl/discl/g
+s/\bdis\. cov/discov/g
+s/\bdis\. pro/dispro/g
+s/\bdis\. tan/distan/g
+s/\bdis\. tur/distur/g
+s/\bem\. ploy/employ/g
+s/\bexperi\. ment/experiment/g
+s/\bfollow\. ing/following/g
+s/\bhow\. ever/however/g
+s/\bnum\. ber/number/g
+s/\bob\. serv/observ/g
+s/\bob\. tain/obtain/g
+s/\bpor\. tion/portion/g
+s/\bpre\. ce/prece/g
+s/\bpre\. sen/presen/g
+s/\bpre\. vi/previ/g
+s/\bpro\. ces/proces/g
+s/\bpro\. duc/produc/g
+s/\bpro\. por/propor/g
+s/\bpro\. pr/propr/g
+s/\bpub\. lish/publish/g
+s/\bre\. cei/recei/g
+s/\bre\. ma/rema/g
+s/\bre\. sum/resum/g
+s/\bsub\. st/subst/g
+s/\bsup\. po/suppo/g
+s/\btem\. per/temper/g
+s/\btempera\. ture/temperature/g
+s/\btrans\. mi/transmi/g
+
+# Fifth group:
+# hyphen followed by "+". One pattern fits them all
+s/\b\([A-Za-z][a-z]+\)-\* /\1/g
 
 # Some special cases:
 # a spurious t is inserted, the part after the hypneh is "tion"

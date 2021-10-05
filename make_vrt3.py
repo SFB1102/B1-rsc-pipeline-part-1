@@ -21,7 +21,7 @@ aparser.add_argument("--build", action="store", dest="build")
 aparser.add_argument('filelist', nargs='+')
 options = aparser.parse_args()
 
-# usage = "Usage: make_vrt.py 8--build=corpusBuild] inputfiles\n"
+# usage = "Usage: make_vrt.py [--build=corpusBuild] inputfiles\n"
 # if len(sys.argv) < 2:
 #  print usage
 #  exit()
@@ -40,6 +40,12 @@ while n < len(options.filelist) :
   for list_item in newtree.findall('list-item'):
       list_item.tag = 'page'
 
+  for t in newtree.findall("page[@table]"):
+    if t.attrib["table"]=="yes":
+      newtree.remove(t)  
+    elif t.attrib["table"]=="no" or t.attrib["table"]=="mixed":
+      del t.attrib["table"]
+    
   newtree.set("id", remove_lb(oldtree.xpath("//article/id/text()")[0].split("/")[1]))
   newtree.set("issn", remove_lb(oldtree.xpath("//article/issn/text()")[0]))
   newtree.set("title", remove_lb(oldtree.xpath("//article/title/text()")[0]))
